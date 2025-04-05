@@ -1,72 +1,27 @@
-# Start a server 
-node server/server.js
-# Getting Started with Create React App
+# 🧯 1Inch (wonder)World
+A World App mini-app that connects the Real Human Network with one-stop access to decentralized finance - all through 1Inch. 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## What does it do?
+The 1Inch (wonder)World mini-app can be thought of as a comprehensive and clean frontend interface for Real Humans to the world of decentralized finance - facilitated by 1Inch's robust suite of products and technologies. 
 
-## Available Scripts
+With the 1Inch (wonder)World app, real humans can perform the following workflows straight from within the World App (i.e. without leaving the Worldcoin Ecosystem):
+- Track their portfolio balances across all their wallets and all major chains that 1Inch supports
+- Initiate cross-chain swaps using 1Inch's MEV-resistant Fusion+ Relayer API for all the chains that 1Inch supports (specifically `
+https://api.1inch.dev/fusion-plus/relayer/v1.0/submit`)
+- See recent trading history across all the chains that 1Inch supports
+- Visualize chart data for onchain assets, including ERC20 tokens, NFTs, and more using the 1inch Charts API
+... and many more to come soon!
 
-In the project directory, you can run:
+## Who is this mini-app for?
+Real humans who want streamlined, easy access to the world of DeFi straight from the World App - removing the need to alt+tab or use a different application to submit trades and track your portfolio.
 
-### `npm start`
+## Why build a mini-app using 1Inch?
+Our mini-app serves two sides of the market:
+1. Providing current and future Real Humans on the World App with a clean frontend for accessing DeFi using 1Inch's battle-tested infrastructure and resolver network
+2. Bringing order flow and volume to the network of Resolvers, contributing to a sustainable and strong DeFi market
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+![Screenshot 2025-04-05 at 5 23 05 PM](https://github.com/user-attachments/assets/02f5923a-a4b5-486d-83ca-c80fcd7f4658)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
