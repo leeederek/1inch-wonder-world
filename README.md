@@ -12,8 +12,6 @@ https://api.1inch.dev/fusion-plus/relayer/v1.0/submit`)
 - Visualize chart data for onchain assets, including ERC20 tokens, NFTs, and more using the 1inch Charts API
 ... and many more to come soon!
 
-![Screenshot 2025-04-05 at 5 02 44 PM-left](https://github.com/user-attachments/assets/ba5a1567-12c3-46dc-8b7a-f6b6824a92b5)
-
 ## Who is this mini-app for?
 Real humans who want streamlined, easy access to the world of DeFi straight from the World App - removint the need to alt+tab or use a different application to submit trades and track your portfolio.
 
@@ -21,6 +19,9 @@ Real humans who want streamlined, easy access to the world of DeFi straight from
 Our mini-app serves two sides of the market:
 1. Providing current and future Real Humans on the World App with a clean frontend for accessing DeFi using 1Inch's battle-tested infrastructure and resolver network
 2. Bringing order flow and volume to the network of Resolvers, contributing to a sustainable and strong DeFi market
+
+![Screenshot 2025-04-05 at 5 23 05 PM](https://github.com/user-attachments/assets/02f5923a-a4b5-486d-83ca-c80fcd7f4658)
+
 
 
 
