@@ -13,7 +13,7 @@ https://api.1inch.dev/fusion-plus/relayer/v1.0/submit`)
 ... and many more to come soon!
 
 ## Who is this mini-app for?
-Real humans who want streamlined, easy access to the world of DeFi straight from the World App - removint the need to alt+tab or use a different application to submit trades and track your portfolio.
+Real humans who want streamlined, easy access to the world of DeFi straight from the World App - removing the need to alt+tab or use a different application to submit trades and track your portfolio.
 
 ## Why build a mini-app using 1Inch?
 Our mini-app serves two sides of the market:
