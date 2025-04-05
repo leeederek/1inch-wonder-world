@@ -14,6 +14,8 @@ function App() {
   const [verificationStatus, setVerificationStatus] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [miniKitStatus, setMiniKitStatus] = useState('checking'); // 'checking', 'installed', 'not-installed'
+  const [isSwapping, setIsSwapping] = useState(false);
+  const [swapStatus, setSwapStatus] = useState(null);
 
   // Update the styles object
   const styles = {
@@ -175,6 +177,36 @@ function App() {
     }
   };
 
+  const handleSwapToken = () => {
+    setIsSwapping(true);
+    setSwapStatus('Initiating swap...');
+    
+    fetch('/api/swap', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: "8000000000000000000",
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        setSwapStatus(`Swap initiated successfully! Order hash: ${data.orderHash}`);
+      } else {
+        setSwapStatus(`Swap failed: ${data.error}`);
+      }
+    })
+    .catch(error => {
+      setSwapStatus(`Error: ${error.message}`);
+      console.error('Swap error:', error);
+    })
+    .finally(() => {
+      setIsSwapping(false);
+    });
+  };
+
   const sendMessage = async (message) => {
     try {
       // Add user message to chat
@@ -285,7 +317,7 @@ function App() {
       setIsVerifying(false);
     }
   };
-  
+
   return (
     <MiniKitProvider>
       <div style={styles.container}>
@@ -316,6 +348,7 @@ function App() {
             time="12:03 PM"
           />
         </div>
+
 
         {/* Verification Section */}
         <div style={styles.verificationSection}>

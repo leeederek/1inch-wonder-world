@@ -3,8 +3,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const { OpenAI } = require('openai');
-const { SDK, NetworkEnum } = require('@1inch/cross-chain-sdk');
+const { SDK, NetworkEnum, HashLock, PrivateKeyProviderConnector } = require('@1inch/cross-chain-sdk');
 const { verifyCloudProof } = require('@worldcoin/minikit-js');
+const { Web3 } = require('web3');
+const { solidityPackedKeccak256, randomBytes, Contract, Wallet, JsonRpcProvider } = require('ethers');
 
 dotenv.config();
 
@@ -28,11 +30,49 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Initialize 1inch SDK
+// Load environment variables
+const process = dotenv.config().parsed;
+
+// Helper function for random bytes
+function getRandomBytes32() {
+    return '0x' + Buffer.from(randomBytes(32)).toString('hex');
+}
+
+// Configuration
+const config = {
+    makerPrivateKey: process?.WALLET_KEY,
+    makerAddress: process?.WALLET_ADDRESS,
+    nodeUrl: process?.RPC_URL,
+    devPortalApiKey: process?.DEV_PORTAL_KEY
+};
+
+// Validate environment variables
+if (!config.makerPrivateKey || !config.makerAddress || !config.nodeUrl || !config.devPortalApiKey) {
+    throw new Error("Missing required environment variables. Please check your .env file.");
+}
+
+// Initialize SDK and providers
+const web3Instance = new Web3(config.nodeUrl);
+const blockchainProvider = new PrivateKeyProviderConnector(config.makerPrivateKey, web3Instance);
+
 const sdk = new SDK({
-  url: "https://api.1inch.dev/fusion-plus",
-  authKey: process.env.INCH_API_KEY // Use the API key from .env
+    url: 'http://localhost:8888/fusion-plus',
+    authKey: config.devPortalApiKey,
+    blockchainProvider
 });
+
+const approveABI = [{
+    "constant": false,
+    "inputs": [
+        { "name": "spender", "type": "address" },
+        { "name": "amount", "type": "uint256" }
+    ],
+    "name": "approve",
+    "outputs": [{ "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+}];
 
 // Add this helper function to handle BigInt serialization
 const JSONBigInt = {
@@ -120,8 +160,8 @@ app.post('/api/fusion/test', async (req, res) => {
 });
 
 app.post('/api/chat', async (req, res) => {
-    try {
-      const { message } = req.body;
+  try {
+    const { message } = req.body;
       console.log('1. Received request from frontend with message:', message);
       
       console.log('2. Making OpenRouter request...');
@@ -130,7 +170,7 @@ app.post('/api/chat', async (req, res) => {
       // Streaming responses
       const stream = await openai.chat.completions.create({
         model: "openai/gpt-4",
-        messages: [{ role: "user", content: message }],
+      messages: [{ role: "user", content: message }],
         stream: true,
       })
       for await (const part of stream) {
@@ -264,6 +304,104 @@ app.post('/api/verify', async (req, res) => {
     });
   }
 });
+
+// Add this new endpoint to handle the swap
+app.post('/api/swap', async (req, res) => {
+    try {
+        const {
+            srcChainId = NetworkEnum.ETHEREUM,
+            dstChainId = NetworkEnum.GNOSIS,
+            srcTokenAddress = "0x6b175474e89094c44da98b954eedeac495271d0f",
+            dstTokenAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            amount = "8000000000000000000"
+        } = req.body;
+
+        // Initialize provider and approve tokens
+        const provider = new JsonRpcProvider(config.nodeUrl);
+        const tkn = new Contract(srcTokenAddress, approveABI, new Wallet(config.makerPrivateKey, provider));
+        
+        await tkn.approve(
+            '0x111111125421ca6dc452d289314280a0f8842a65', // aggregation router v6
+            (2n**256n - 1n) // unlimited allowance
+        );
+
+        const params = {
+            srcChainId,
+            dstChainId,
+            srcTokenAddress,
+            dstTokenAddress,
+            amount,
+            enableEstimate: true,
+            walletAddress: config.makerAddress
+        };
+
+        const quote = await sdk.getQuote(params);
+        const secretsCount = quote.getPreset().secretsCount;
+        const secrets = Array.from({ length: secretsCount }).map(() => getRandomBytes32());
+        const secretHashes = secrets.map(x => HashLock.hashSecret(x));
+
+        const hashLock = secretsCount === 1
+            ? HashLock.forSingleFill(secrets[0])
+            : HashLock.forMultipleFills(
+                secretHashes.map((secretHash, i) =>
+                    solidityPackedKeccak256(['uint64', 'bytes32'], [i, secretHash.toString()])
+                )
+            );
+
+        const quoteResponse = await sdk.placeOrder(quote, {
+            walletAddress: config.makerAddress,
+            hashLock,
+            secretHashes
+        });
+
+        // Start monitoring the order
+        monitorOrder(quoteResponse.orderHash, secrets, sdk);
+
+        res.json({
+            success: true,
+            orderHash: quoteResponse.orderHash,
+            message: "Order placed successfully"
+        });
+
+    } catch (error) {
+        console.error("Swap error:", error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Helper function to monitor order status
+function monitorOrder(orderHash, secrets, sdk) {
+    const intervalId = setInterval(async () => {
+        try {
+            const order = await sdk.getOrderStatus(orderHash);
+            if (order.status === 'executed') {
+                console.log(`Order ${orderHash} is complete`);
+                clearInterval(intervalId);
+                return;
+            }
+
+            const fillsObject = await sdk.getReadyToAcceptSecretFills(orderHash);
+            if (fillsObject.fills.length > 0) {
+                for (const fill of fillsObject.fills) {
+                    try {
+                        await sdk.submitSecret(orderHash, secrets[fill.idx]);
+                        console.log(`Secret submitted for fill index ${fill.idx}`);
+                    } catch (error) {
+                        console.error(`Error submitting secret: ${error.message}`);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(`Monitoring error: ${error.message}`);
+        }
+    }, 5000);
+
+    // Clear interval after 30 minutes to prevent infinite running
+    setTimeout(() => clearInterval(intervalId), 30 * 60 * 1000);
+}
 
 const startServer = async (initialPort) => {
   let currentPort = initialPort;
