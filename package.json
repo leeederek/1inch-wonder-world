@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@1inch/byte-utils": "^3.1.0",
+    "@1inch/cross-chain-sdk": "^0.1.13",
     "@openrouter/ai-sdk-provider": "^0.4.5",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -18,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
+    "viem": "^2.25.0",
     "web-vitals": "^2.1.4",
     "zod": "^3.24.2"
   },
